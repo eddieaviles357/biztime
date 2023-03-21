@@ -12,6 +12,8 @@ router.get('/', async( req, res, next ) => {
     }
 });
 
+
+
 /** GET /companies/[code] get a company by [code] */
 router.get('/:code', async( req, res, next ) => {
     try {
@@ -28,6 +30,8 @@ router.get('/:code', async( req, res, next ) => {
     }
 });
 
+
+
 /** POST /companies/ add a company */
 router.post('/', async( req, res, next ) => {
     try {
@@ -38,7 +42,7 @@ router.post('/', async( req, res, next ) => {
             RETURNING code, name, description`,
             [ code, name, description ]
         );
-        return res.status( 201 ).json( { message: queryRes.rows[0] } )
+        return res.status( 201 ).json( { company: queryRes.rows[0] } )
     } catch ( err ) {
         /** Handle SQL code Error */
         if(err.code) {
@@ -56,4 +60,7 @@ router.post('/', async( req, res, next ) => {
     }
 });
 
+
+
+/**  */
 module.exports = router;
