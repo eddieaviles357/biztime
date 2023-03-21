@@ -36,31 +36,45 @@ router.get('/:code', async( req, res, next ) => {
 router.post('/', async( req, res, next ) => {
     try {
         let { code, name, description } = req.body;
+
         let queryRes = await db.query(
             `INSERT INTO companies (code, name, description)
             VALUES($1, $2, $3)
             RETURNING code, name, description`,
             [ code, name, description ]
         );
+
         return res.status( 201 ).json( { company: queryRes.rows[0] } )
     } catch ( err ) {
         /** Handle SQL code Error */
-        if(err.code) {
-            switch(err.code) {
-                /** Duplication error */
-                case("23505"):
-                    return next(new ExpressError("Can't Enter Duplicate Fields", 404));
-                /** No data error */
-                case("02000"):
-                    return next(new ExpressError("No Data", 404));
-            }
-        };
-        
+        if( err.code ) next( ExpressError.SQLCodeHandler(err) );
         return next( err );
     }
 });
 
 
 
-/**  */
+/** PUT /companies/[code] update an existing company in db */
+router.put('/:code', async( req, res, next ) => {
+    try {
+        let { code } = req.params;
+        let { name, description } = req.body;
+        
+        let queryRes = await db.query( `
+            UPDATE companies SET name=$1, description=$2 WHERE code=$3
+            RETURNING code, name, description`,
+            [ name, description, code ]
+            );
+
+        if(queryRes.rowCount < 1) throw new ExpressError(`${code} does not exist in DB`, 404);
+        return res.status(200).json({ company: queryRes.rows[0]})
+    } catch (err) {
+        /** Handle SQL code Error */
+        if( err.code ) next( ExpressError.SQLCodeHandler(err) );
+        return next( err );
+    }
+});
+
+
+/** DELETE 204 */
 module.exports = router;
