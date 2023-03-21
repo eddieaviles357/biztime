@@ -10,8 +10,22 @@ class ExpressError extends Error {
     this.message = message;
     this.status = status;
     console.error(this.stack);
-  }
-}
+  };
+
+  static SQLCodeHandler(err) {
+    /** Handle SQL code Error */
+    switch( err.code ) {
+        /** Duplication error */
+        case( "23505" ):
+            return new ExpressError( "Can't Enter Duplicate Fields", 404 );
+        /** No data error */
+        case("02000"):
+            return new ExpressError( "No Data", 404 );
+    };
+  };
+
+};
+
 
 
 module.exports = ExpressError;
