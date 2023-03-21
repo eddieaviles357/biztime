@@ -8,7 +8,7 @@ const ExpressError = require("./expressError")
 
 app.use(express.json());
 
-/** companies/ routes */
+/** /companies/... routes */
 const companiesRoutes = require('./routes/companies');
 app.use('/companies', companiesRoutes);
 
