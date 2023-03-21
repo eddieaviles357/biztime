@@ -5,11 +5,12 @@ const ExpressError = require('../expressError');
 /** GET /invoices get all invoices */
 router.get('/', async( req, res, next ) => {
     try {
-        return res.status(200).json({message: 'test'})
+        let result = await db.query(`SELECT * FROM invoices`);
+        return res.status(200).json( { invoices: result.rows } );
     } catch ( err ) {
         return next( err );
     }
-})
+});
 
 
 
