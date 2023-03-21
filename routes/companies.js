@@ -47,7 +47,7 @@ router.post('/', async( req, res, next ) => {
         return res.status( 201 ).json( { company: queryRes.rows[0] } )
     } catch ( err ) {
         /** Handle SQL code Error */
-        if( err.code ) next( ExpressError.SQLCodeHandler(err) );
+        if( err.code ) next( ExpressError.SQLCodeHandler( err ) );
         return next( err );
     }
 });
@@ -59,22 +59,41 @@ router.put('/:code', async( req, res, next ) => {
     try {
         let { code } = req.params;
         let { name, description } = req.body;
-        
+
         let queryRes = await db.query( `
             UPDATE companies SET name=$1, description=$2 WHERE code=$3
             RETURNING code, name, description`,
             [ name, description, code ]
             );
 
-        if(queryRes.rowCount < 1) throw new ExpressError(`${code} does not exist in DB`, 404);
-        return res.status(200).json({ company: queryRes.rows[0]})
+        if(queryRes.rowCount < 1) throw new ExpressError(`${ code } does not exist in DB`, 404);
+        return res.status( 200 ).json( { company: queryRes.rows[0] } )
     } catch (err) {
         /** Handle SQL code Error */
-        if( err.code ) next( ExpressError.SQLCodeHandler(err) );
+        if( err.code ) next( ExpressError.SQLCodeHandler( err ) );
         return next( err );
     }
 });
 
 
-/** DELETE 204 */
+/** DELETE /companies/[code]*/
+router.delete('/:code', async( req, res, next ) => {
+    try {
+        let { code } = req.params;
+
+        let queryRes = await db.query( `
+            DELETE FROM companies WHERE code=$1`,
+            [ code ]
+            );
+            if(queryRes.rowCount < 1) throw new ExpressError(`${ code } does not exist in DB`, 404);
+        return res.status(200).json( { status: "deleted" } )
+    } catch (err) {
+        /** Handle SQL code Error */
+        if( err.code ) next( ExpressError.SQLCodeHandler( err ) );
+        return next( err );
+    }
+});
+
+
+
 module.exports = router;
