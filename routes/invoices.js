@@ -12,6 +12,29 @@ router.get('/', async( req, res, next ) => {
     }
 });
 
+/** GET /invoices/[id] */
+router.get('/:id', async( req, res, next ) => {
+
+});
+
+
+/** POST /invoices */
+router.post('/', async( req, res, next ) => {
+
+});
+/** PUT /invoices/[id] */
+router.put('/:id', async( req, res, next ) => {
+
+});
+
+/** DELETE /invoices/[id] */
+router.delete('/:id', async( req, res, next ) => {
+
+});
+/** GET /companies/[code] */
+router.get('/:code', async( req, res, next ) => {
+
+});
 
 
 module.exports = router;
