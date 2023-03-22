@@ -46,7 +46,7 @@ router.post('/', async( req, res, next ) => {
         INSERT INTO invoices (comp_code, amt, paid, paid_date)
         VALUES ($1, $2, false, null)
         RETURNING id, comp_code, amt, paid, add_date, paid_date
-        `, [ comp_code, amt ]);
+        `, [ comp_code, amt ] );
 
         return res.status( 201 ).json( { invoices: result.rows[0] } );
     } catch ( err ) {
@@ -68,12 +68,12 @@ router.put('/:id', async( req, res, next ) => {
             UPDATE invoices SET amt=$1 
             WHERE id=$2
             RETURNING id, comp_code, amt, paid, add_date, paid_date
-        `, [amt, id]);
+        `, [ amt, id ] );
 
         if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in DB`, 404);
         return res.status(200).json( { invoice: result.rows[0] } );
     } catch ( err ) {
-        next( err );
+        return next( err );
     }
 });
 
@@ -82,20 +82,18 @@ router.put('/:id', async( req, res, next ) => {
 /** DELETE /invoices/[id] */
 router.delete('/:id', async( req, res, next ) => {
     try {
-        
+        let { id } = req.params;
+
+        let result = await db.query(`
+        DELETE FROM invoices
+        WHERE id=$1
+        `, [ id ] );
+        console.log(result)
+
+        if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in DB`, 404);
+        return res.status(200).json( { status: "deleted" } );
     } catch ( err ) {
-        next( err );
-    }
-});
-
-
-
-/** GET /companies/[code] */
-router.get('/:code', async( req, res, next ) => {
-    try {
-        
-    } catch ( err ) {
-        next( err );
+        return next( err );
     }
 });
 
