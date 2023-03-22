@@ -14,7 +14,19 @@ router.get('/', async( req, res, next ) => {
 
 /** GET /invoices/[id] */
 router.get('/:id', async( req, res, next ) => {
-
+    try {
+        let { id } = req.params;
+        let result = await db.query(`
+            SELECT id, amt, paid, add_date, paid_date, code, com.name, com.description 
+            FROM companies com 
+            JOIN invoices inv ON com.code = inv.comp_code 
+            WHERE id=$1
+            `, [ id ] );
+            if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in DB`, 404);
+        return res.status( 200 ).json( { invoice: result.rows[0] } );
+    } catch ( err ) {
+        return next( err );
+    }
 });
 
 
