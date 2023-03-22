@@ -17,7 +17,7 @@ router.get('/', async( req, res, next ) => {
 /** GET /companies/[code] get a company by [code] */
 router.get('/:code', async( req, res, next ) => {
     try {
-        let { code } = req.params;
+        const { code } = req.params;
         let result = await db.query(
             'SELECT code, name, description FROM companies WHERE code=$1', 
             [ code ]
@@ -35,7 +35,7 @@ router.get('/:code', async( req, res, next ) => {
 /** POST /companies/ add a company */
 router.post('/', async( req, res, next ) => {
     try {
-        let { code, name, description } = req.body;
+        const { code, name, description } = req.body;
 
         let result = await db.query(
             `INSERT INTO companies (code, name, description)
@@ -57,8 +57,8 @@ router.post('/', async( req, res, next ) => {
 /** PUT /companies/[code] update an existing company in db */
 router.put('/:code', async( req, res, next ) => {
     try {
-        let { code } = req.params;
-        let { name, description } = req.body;
+        const { code } = req.params;
+        const { name, description } = req.body;
 
         let result = await db.query( `
             UPDATE companies SET name=$1, description=$2 WHERE code=$3
@@ -79,7 +79,7 @@ router.put('/:code', async( req, res, next ) => {
 /** DELETE /companies/[code]*/
 router.delete('/:code', async( req, res, next ) => {
     try {
-        let { code } = req.params;
+        const { code } = req.params;
 
         let result = await db.query( `
             DELETE FROM companies WHERE code=$1`,
