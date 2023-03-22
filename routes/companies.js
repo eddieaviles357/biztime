@@ -18,13 +18,22 @@ router.get('/', async( req, res, next ) => {
 router.get('/:code', async( req, res, next ) => {
     try {
         const { code } = req.params;
-        let result = await db.query(
+        
+        let compResult = await db.query(
             'SELECT code, name, description FROM companies WHERE code=$1', 
             [ code ]
             );
+        
+        let invResults = await db.query(
+            `SELECT id, amt, paid, add_date, paid_date, code 
+            FROM companies com JOIN invoices inv 
+            ON com.code = inv.comp_code 
+            WHERE inv.comp_code = $1`,
+             [ code ] );
+        
         /** Does not exist throw Error with a 404 status */
-        if( result.rows[0] === undefined ) throw new ExpressError( `${ code } is not in DB`, 404 ); 
-        return res.status(200).json({company: result.rows[0]});
+        if( compResult.rows[0] === undefined ) throw new ExpressError( `${ code } is not in DB`, 404 ); 
+        return res.status(200).json( { company: compResult.rows[0], invoices: invResults.rows });
     } catch (err) {
         return next(err);
     }
@@ -60,8 +69,8 @@ router.put('/:code', async( req, res, next ) => {
         const { code } = req.params;
         const { name, description } = req.body;
 
-        let result = await db.query( `
-            UPDATE companies SET name=$1, description=$2 WHERE code=$3
+        let result = await db.query(
+            `UPDATE companies SET name=$1, description=$2 WHERE code=$3
             RETURNING code, name, description`,
             [ name, description, code ]
             );
@@ -81,8 +90,8 @@ router.delete('/:code', async( req, res, next ) => {
     try {
         const { code } = req.params;
 
-        let result = await db.query( `
-            DELETE FROM companies WHERE code=$1`,
+        let result = await db.query(
+            `DELETE FROM companies WHERE code=$1`,
             [ code ]
             );
             if(result.rowCount < 1) throw new ExpressError(`${ code } does not exist in DB`, 404);
