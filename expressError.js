@@ -18,6 +18,8 @@ class ExpressError extends Error {
         /** Duplication error */
         case( "23505" ):
             return new ExpressError( "Can't Enter Duplicate Fields", 404 );
+        case( "23503" ):
+            return new ExpressError( "Not present in db", 404 );
         /** No data error */
         case("02000"):
             return new ExpressError( "No Data", 404 );
