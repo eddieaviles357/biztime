@@ -10,7 +10,9 @@
   "version": "1.0.0",
   "description": "invoice tracker",
   "main": "app.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^29.5.0"
+  },
   "author": "eduardo aviles",
   "license": "ISC"
 }
