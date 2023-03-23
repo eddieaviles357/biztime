@@ -79,4 +79,23 @@ describe('GET /invoices/:id', () => {
             status: 404
           });
     });
-})
+});
+
+
+describe('POST /invoices', () => {
+    test('add an invoice to db', async() => {
+        const comp_code = 'bbraun';
+        const amt = 100;
+        const res = await request(app).post('/invoices').send( { comp_code, amt } );
+        const body = res.body;
+        expect(res.statusCode).toBe(201);
+        expect(body).toHaveProperty('invoices', {
+            id: id+1,
+            comp_code: 'bbraun',
+            amt: 100,
+            paid: false,
+            add_date: '2023-03-22T07:00:00.000Z',
+            paid_date: null
+        });
+    });
+});
