@@ -53,3 +53,25 @@ describe('GET /companies', () => {
         expect(body).toHaveProperty('companies', [ { code, name, description } ] );
     });
 });
+
+describe('GET /companies/:code', () => {
+    test('get company by code', async() => {
+        const res = await request(app).get(`/companies/${code}`);
+        let body = res.body
+
+        expect(res.statusCode).toBe(200);
+        expect(body).toHaveProperty('company', { code, name, description } );
+    });
+
+    test('try to get company with invalid code', async() => {
+        const invCode = 'invcode'
+        const res = await request(app).get(`/companies/${invCode}`);
+        let body = res.body
+
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', { 
+            message: `${invCode} is not in db`,
+            status: 404 
+        } );
+    })
+});
