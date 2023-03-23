@@ -91,11 +91,23 @@ describe('POST /invoices', () => {
         expect(res.statusCode).toBe(201);
         expect(body).toHaveProperty('invoices', {
             id: id+1,
-            comp_code: 'bbraun',
-            amt: 100,
+            comp_code,
+            amt,
             paid: false,
             add_date: '2023-03-22T07:00:00.000Z',
             paid_date: null
+        });
+    });
+
+    test('try to add an invoice to a non existing company', async() => {
+        const comp_code = 'invalid';
+        const amt = 100;
+        const res = await request(app).post('/invoices').send( { comp_code, amt } );
+        const body = res.body;
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', { 
+            message: 'Not present in db',
+            status: 404
         });
     });
 });
