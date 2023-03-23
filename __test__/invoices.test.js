@@ -34,7 +34,7 @@ describe('GET /invoices', () => {
     test('get all invoices in db', async() => {
         const res = await request(app).get('/invoices');
         let body = res.body
-        
+
         expect(res.statusCode).toBe(200);
         expect(body).toHaveProperty('invoices', [
             {
@@ -68,7 +68,7 @@ describe('GET /invoices/:id', () => {
           });
     });
 
-    test('get an invoice by id', async() => {
+    test('try getting an invoice by id with non existing id', async() => {
         const invId = 0;
         const res = await request(app).get(`/invoices/${invId}`);
         const body = res.body
