@@ -75,7 +75,7 @@ describe('GET /invoices/:id', () => {
 
         expect(res.statusCode).toBe(404);
         expect(body).toHaveProperty('error', {
-            message: `Id: ${invId} does not exist in DB`,
+            message: `Id: ${invId} does not exist in db`,
             status: 404
           });
     });
@@ -126,5 +126,17 @@ describe('PUT /invoices/:id', () => {
             add_date: '2023-03-22T07:00:00.000Z',
             paid_date: null
           });
+    });
+
+    test('try to update an existing invoice with an invalid id', async() => {
+        const amt = 100;
+        const nonId = 0;
+        const res = await request(app).put(`/invoices/${nonId}`).send( { amt } );
+        const body = res.body;
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', { 
+            message: `Id: ${nonId} does not exist in db`,
+            status: 404
+        });
     });
 });

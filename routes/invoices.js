@@ -28,7 +28,7 @@ router.get('/:id', async( req, res, next ) => {
             WHERE id=$1`,
             [ id ] );
 
-            if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in DB`, 404);
+            if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in db`, 404);
         return res.status( 200 ).json( { invoice: result.rows[0] } );
     } catch ( err ) {
         return next( err );
@@ -70,7 +70,7 @@ router.put('/:id', async( req, res, next ) => {
             RETURNING id, comp_code, amt, paid, add_date, paid_date`, 
             [ amt, id ] );
 
-        if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in DB`, 404);
+        if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in db`, 404);
         return res.status(200).json( { invoice: result.rows[0] } );
     } catch ( err ) {
         return next( err );
@@ -89,7 +89,7 @@ router.delete('/:id', async( req, res, next ) => {
         WHERE id=$1`, 
         [ id ] );
 
-        if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in DB`, 404);
+        if(result.rowCount < 1) throw new ExpressError(`Id: ${ id } does not exist in db`, 404);
         return res.status(200).json( { status: "deleted" } );
     } catch ( err ) {
         return next( err );
