@@ -111,3 +111,20 @@ describe('POST /invoices', () => {
         });
     });
 });
+
+describe('PUT /invoices/:id', () => {
+    test('update an existing invoice', async() => {
+        const amt = 100;
+        const res = await request(app).put(`/invoices/${id}`).send( { amt } );
+        const body = res.body;
+        expect(res.statusCode).toBe(200);
+        expect(body).toHaveProperty('invoice', {
+            id,
+            comp_code: 'bbraun',
+            amt,
+            paid: false,
+            add_date: '2023-03-22T07:00:00.000Z',
+            paid_date: null
+          });
+    });
+});
