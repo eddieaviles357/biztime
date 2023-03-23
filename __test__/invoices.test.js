@@ -130,12 +130,32 @@ describe('PUT /invoices/:id', () => {
 
     test('try to update an existing invoice with an invalid id', async() => {
         const amt = 100;
-        const nonId = 0;
-        const res = await request(app).put(`/invoices/${nonId}`).send( { amt } );
+        const invId = 0;
+        const res = await request(app).put(`/invoices/${invId}`).send( { amt } );
         const body = res.body;
         expect(res.statusCode).toBe(404);
         expect(body).toHaveProperty('error', { 
-            message: `Id: ${nonId} does not exist in db`,
+            message: `Id: ${invId} does not exist in db`,
+            status: 404
+        });
+    });
+});
+
+describe('DELETE /invoices/:id', () => {
+    test('delete an invoice', async() => {
+        const res = await request(app).delete(`/invoices/${id}`);
+        const body = res.body;
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toHaveProperty('status', 'deleted');
+    });
+
+    test('try to delete an invoice that does not exist', async() => {
+        const invId = 0;
+        const res = await request(app).delete(`/invoices/${invId}`);
+        const body = res.body;
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', { 
+            message: `Id: ${invId} does not exist in db`,
             status: 404
         });
     });
