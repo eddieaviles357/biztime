@@ -1,3 +1,4 @@
+/** jest invoices.test.js */
 process.env.NODE_ENV = 'test';
 
 const request = require('supertest');
@@ -32,17 +33,50 @@ afterAll( async() => {
 describe('GET /invoices', () => {
     test('get all invoices in db', async() => {
         const res = await request(app).get('/invoices');
+        let body = res.body
+        
         expect(res.statusCode).toBe(200);
-        expect(res.body).toEqual({ 
-            "invoices": [
-                {
-                    id,
-                    "comp_code":"bbraun",
-                    "amt":100,"paid":false,
-                    "add_date":"2023-03-22T07:00:00.000Z",
-                    "paid_date":null
-                }
-            ] 
-        });
-    })
+        expect(body).toHaveProperty('invoices', [
+            {
+                id,
+                "comp_code":"bbraun",
+                "amt":100,
+                "paid":false,
+                "add_date":"2023-03-22T07:00:00.000Z",
+                "paid_date":null
+            }
+        ] );
+    });
 });
+
+
+describe('GET /invoices/:id', () => {
+    test('get an invoice by id', async() => {
+        const res = await request(app).get(`/invoices/${id}`);
+        const body = res.body
+
+        expect(res.statusCode).toBe(200);
+        expect(body).toHaveProperty('invoice', {
+            id,
+            amt: 100,
+            paid: false,
+            add_date: '2023-03-22T07:00:00.000Z',
+            paid_date: null,
+            code: 'bbraun',
+            name: 'medical',
+            description: 'liquid.'
+          });
+    });
+
+    test('get an invoice by id', async() => {
+        const invId = 0;
+        const res = await request(app).get(`/invoices/${invId}`);
+        const body = res.body
+
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', {
+            message: `Id: ${invId} does not exist in DB`,
+            status: 404
+          });
+    });
+})
