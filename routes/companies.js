@@ -32,7 +32,7 @@ router.get('/:code', async( req, res, next ) => {
              [ code ] );
         
         /** Does not exist throw Error with a 404 status */
-        if( compResult.rows[0] === undefined ) throw new ExpressError( `${ code } is not in DB`, 404 ); 
+        if( compResult.rows[0] === undefined ) throw new ExpressError( `${ code } is not in db`, 404 ); 
         return res.status(200).json( { company: compResult.rows[0], invoices: invResults.rows });
     } catch (err) {
         return next(err);
@@ -75,7 +75,7 @@ router.put('/:code', async( req, res, next ) => {
             [ name, description, code ]
             );
 
-        if(result.rowCount < 1) throw new ExpressError(`${ code } does not exist in DB`, 404);
+        if(result.rowCount < 1) throw new ExpressError(`${ code } does not exist in db`, 404);
         return res.status( 200 ).json( { company: result.rows[0] } )
     } catch (err) {
         /** Handle SQL code Error */
@@ -94,7 +94,7 @@ router.delete('/:code', async( req, res, next ) => {
             `DELETE FROM companies WHERE code=$1`,
             [ code ]
             );
-            if(result.rowCount < 1) throw new ExpressError(`${ code } does not exist in DB`, 404);
+            if(result.rowCount < 1) throw new ExpressError(`${ code } does not exist in db`, 404);
         return res.status(200).json( { status: "deleted" } )
     } catch (err) {
         /** Handle SQL code Error */
