@@ -102,3 +102,34 @@ describe('POST /companies/', () => {
         } );
     });
 });
+
+describe('PUT /companies/:code', () => {
+    test('update existing company data', async() => {
+        const name = description = 'test';
+        const res = await request(app)
+                        .put(`/companies/${code}`)
+                        .send({ name: 'test', description: 'test'});
+        let body = res.body;
+
+        expect(res.statusCode).toBe(200);
+        expect(body).toHaveProperty('company', { 
+            code,
+            name,
+            description
+        } );
+    });
+
+    test('try to update company data that doesn"t exist', async() => {
+        const code = name = description = 'dontexist';
+        const res = await request(app)
+                        .put('/companies/')
+                        .send( { code, name, description } );
+        let body = res.body;
+
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', { 
+            message: "Not Found",
+            status: 404 
+        } );
+    });
+});
