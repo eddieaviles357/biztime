@@ -133,3 +133,25 @@ describe('PUT /companies/:code', () => {
         } );
     });
 });
+
+
+describe('DELETE /companies/:code', () => {
+    test('delete an existing company', async() => {
+        const res = await request(app).delete(`/companies/${code}`);
+        const body = res.body;
+        expect(res.statusCode).toBe(200);
+        expect(body).toHaveProperty('status', 'deleted');
+    });
+
+    test('try to delete a company that does not exist', async() => {
+        const invCode = 'test';
+        const res = await request(app).delete(`/companies/${invCode}`);
+        const body = res.body;
+        expect(res.statusCode).toBe(404);
+        console.log(body)
+        expect(body).toHaveProperty('error', { 
+            message: 'test does not exist in db',
+            status: 404
+        });
+    });
+});
