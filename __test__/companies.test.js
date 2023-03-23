@@ -47,7 +47,7 @@ afterAll( async() => {
 describe('GET /companies', () => {
     test('get all companies in db', async() => {
         const res = await request(app).get('/companies');
-        let body = res.body
+        let body = res.body;
 
         expect(res.statusCode).toBe(200);
         expect(body).toHaveProperty('companies', [ { code, name, description } ] );
@@ -57,7 +57,7 @@ describe('GET /companies', () => {
 describe('GET /companies/:code', () => {
     test('get company by code', async() => {
         const res = await request(app).get(`/companies/${code}`);
-        let body = res.body
+        let body = res.body;
 
         expect(res.statusCode).toBe(200);
         expect(body).toHaveProperty('company', { code, name, description } );
@@ -66,12 +66,39 @@ describe('GET /companies/:code', () => {
     test('try to get company with invalid code', async() => {
         const invCode = 'invcode'
         const res = await request(app).get(`/companies/${invCode}`);
-        let body = res.body
+        let body = res.body;
 
         expect(res.statusCode).toBe(404);
         expect(body).toHaveProperty('error', { 
             message: `${invCode} is not in db`,
             status: 404 
         } );
-    })
+    });
+});
+
+describe('POST /companies/', () => {
+    test('add a company to db', async() => {
+        const code = name = 'target';
+        const description = 'super store';
+        const res = await request(app)
+                        .post('/companies/')
+                        .send( { code, name, description } );
+        let body = res.body;
+
+        expect(res.statusCode).toBe(201);
+        expect(body).toHaveProperty('company', { code, name, description } );
+    });
+
+    test('try to add a company with duplicate name', async() => {
+        const res = await request(app)
+                        .post('/companies/')
+                        .send( { code, name, description } );
+        let body = res.body;
+
+        expect(res.statusCode).toBe(404);
+        expect(body).toHaveProperty('error', { 
+            message: "Can't Enter Duplicate Fields",
+            status: 404 
+        } );
+    });
 });
