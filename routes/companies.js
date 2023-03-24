@@ -23,7 +23,10 @@ router.get('/:code', async( req, res, next ) => {
             'SELECT code, name, description FROM companies WHERE code=$1', 
             [ code ]
             );
-        
+
+        /** Does not exist throw Error with a 404 status exit */
+        if( compResult.rows[0] === undefined ) throw new ExpressError( `${ code } is not in db`, 404 );
+
         let invResults = await db.query(
             `SELECT id, amt, paid, add_date, paid_date, code 
             FROM companies com JOIN invoices inv 
@@ -31,9 +34,21 @@ router.get('/:code', async( req, res, next ) => {
             WHERE inv.comp_code = $1`,
              [ code ] );
         
-        /** Does not exist throw Error with a 404 status */
-        if( compResult.rows[0] === undefined ) throw new ExpressError( `${ code } is not in db`, 404 ); 
-        return res.status(200).json( { company: compResult.rows[0], invoices: invResults.rows });
+        let indResults = await db.query(
+            `SELECT ind.industry FROM companies_industries AS comp_ind
+            JOIN companies AS comp ON comp.code = comp_ind.company_code
+            JOIN industries AS ind ON ind.code = comp_ind.industry_code
+            WHERE comp.code=$1`,
+            [ code ] );
+        
+        // assign properties to company obj
+        let company = compResult.rows[0];
+        // assing invoices to company obj
+        company.invoices = invResults.rows;
+        // extract industries name as a new Array
+        company.industries = indResults.rows.map( ({ industry }) => industry );
+ 
+        return res.status(200).json( { company } );
     } catch (err) {
         return next(err);
     }
