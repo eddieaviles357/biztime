@@ -2,6 +2,8 @@
 
 DROP TABLE IF EXISTS invoices;
 DROP TABLE IF EXISTS companies;
+DROP TABLE IF EXISTS industries;
+DROP TABLE IF EXISTS companies_industries;
 
 CREATE TABLE companies (
     code text PRIMARY KEY,
@@ -19,6 +21,18 @@ CREATE TABLE invoices (
     CONSTRAINT invoices_amt_check CHECK ((amt > (0)::double precision))
 );
 
+CREATE TABLE industries (
+  code text PRIMARY KEY,
+  industry text NOT NULL
+);
+
+CREATE TABLE companies_industries (
+    company_code text REFERENCES companies NOT NULL,
+    industry_code text REFERENCES industries NOT NULL,
+    PRIMARY KEY (company_code, industry_code)
+);
+
+
 -- INSERT INTO companies
 --   VALUES ('apple', 'Apple Computer', 'Maker of OSX.'),
 --          ('ibm', 'IBM', 'Big blue.');
@@ -28,3 +42,17 @@ CREATE TABLE invoices (
 --          ('apple', 200, false, null),
 --          ('apple', 300, true, '2018-01-01'),
 --          ('ibm', 400, false, null);
+
+-- INSERT INTO industries (code, industry)
+--   VALUES ('tech', 'technology'),
+--          ('med', 'medical'),
+--          ('ent', 'entertainment'),
+--          ('manf', 'manufacturing');
+
+
+-- INSERT INTO companies_industries (company_code, industry_code)
+--   VALUES ('apple', 'tech'),
+--          ('apple', 'ent'),
+--          ('ibm', 'tech'),
+--          ('3m', 'med'),
+--          ('3m', 'manf');
