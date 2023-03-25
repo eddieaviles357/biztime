@@ -9,6 +9,7 @@ let id;
 let code;
 let name;
 let description;
+let industries;
 beforeEach( async() => {
     let companies = await db.query(
         `INSERT INTO companies
@@ -20,13 +21,27 @@ beforeEach( async() => {
     code = res.code;
     name = res.name;
     description = res.description;
-    let invoices = await db.query(
+    let invoicesRes = await db.query(
         `INSERT INTO invoices (comp_code, amt, paid, paid_date)
         VALUES 
         ('bbraun', 100, false, null)
-        RETURNING id`);
+        RETURNING id, comp_code, amt, paid, paid_date, add_date`);
     /** assign id for testing */
-    id = invoices.rows[0].id;
+    id = invoicesRes.rows[0].id;
+
+    let indResults = await db.query(
+        `INSERT INTO industries (code, industry)
+        VALUES 
+        ('tech', 'technology')
+        RETURNING code, industry`
+    );
+    industries = indResults.rows;
+
+    let com_ind = await db.query(
+        `INSERT INTO companies_industries (company_code, industry_code)
+        VALUES 
+        ('bbraun', 'tech')`
+    );
 });
 
 // clean up
@@ -35,8 +50,11 @@ afterEach( async() => {
     code = null;
     name = null;
     description = null;
+    industries = null;
     await db.query(`DELETE FROM invoices`);
     await db.query(`DELETE FROM companies`);
+    await db.query(`DELETE FROM industries`);
+    await db.query(`DELETE FROM companies_industries`);
 });
 
 // close the connection to db
@@ -58,9 +76,23 @@ describe('GET /companies/:code', () => {
     test('get company by code', async() => {
         const res = await request(app).get(`/companies/${code}`);
         let body = res.body;
-
         expect(res.statusCode).toBe(200);
-        expect(body).toHaveProperty('company', { code, name, description } );
+         expect(body).toHaveProperty('company', {
+            code, 
+            description, 
+            "industries": ["technology"], 
+            "invoices": [
+                {
+                    "add_date": "2023-03-24T07:00:00.000Z", 
+                    "amt": 100, 
+                    "code": "bbraun", 
+                    id, 
+                    "paid": false, 
+                    "paid_date": null
+                }
+            ], 
+            "name": "medical"
+        })
     });
 
     test('try to get company with invalid code', async() => {
@@ -148,10 +180,9 @@ describe('DELETE /companies/:code', () => {
         const res = await request(app).delete(`/companies/${invCode}`);
         const body = res.body;
         expect(res.statusCode).toBe(404);
-        console.log(body)
         expect(body).toHaveProperty('error', { 
             message: 'test does not exist in db',
             status: 404
-        });
+            });
     });
 });
