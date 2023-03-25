@@ -1,8 +1,8 @@
 \c biztime_test
 
-DROP TABLE IF EXISTS invoices;
-DROP TABLE IF EXISTS companies;
-DROP TABLE IF EXISTS industries;
+DROP TABLE IF EXISTS invoices CASCADE;
+DROP TABLE IF EXISTS companies CASCADE;
+DROP TABLE IF EXISTS industries CASCADE;
 DROP TABLE IF EXISTS companies_industries;
 
 CREATE TABLE companies (
@@ -26,22 +26,29 @@ CREATE TABLE industries (
   industry text NOT NULL
 );
 
+
 CREATE TABLE companies_industries (
-    company_code text REFERENCES companies NOT NULL,
-    industry_code text REFERENCES industries NOT NULL,
-    PRIMARY KEY (company_code, industry_code)
+    id serial PRIMARY KEY,
+    company_code text REFERENCES companies ON DELETE CASCADE,
+    industry_code text REFERENCES industries ON DELETE CASCADE
+    -- PRIMARY KEY (company_code, industry_code)
 );
 
 
 -- INSERT INTO companies
 --   VALUES ('apple', 'Apple Computer', 'Maker of OSX.'),
---          ('ibm', 'IBM', 'Big blue.');
+--          ('ibm', 'IBM', 'Big blue.'),
+--          ('3m', 'mmm', 'Mining Manufacturing Minnesotta'),
+--          ('bb', 'best buy', 'tech big blue'),
+--          ('target', 'target', 'big red');
 
 -- INSERT INTO invoices (comp_code, amt, paid, paid_date)
 --   VALUES ('apple', 100, false, null),
 --          ('apple', 200, false, null),
 --          ('apple', 300, true, '2018-01-01'),
---          ('ibm', 400, false, null);
+--          ('ibm', 400, false, null),
+--          ('3m', 200, false, null),
+--          ('bb', 300, false, null);
 
 -- INSERT INTO industries (code, industry)
 --   VALUES ('tech', 'technology'),
