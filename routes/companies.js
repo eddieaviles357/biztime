@@ -47,7 +47,6 @@ router.get('/:code', async( req, res, next ) => {
         company.invoices = invResults.rows;
         // extract industries name as a new Array
         company.industries = indResults.rows.map( ({ industry }) => industry );
- 
         return res.status(200).json( { company } );
     } catch (err) {
         return next(err);
