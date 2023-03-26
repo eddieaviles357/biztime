@@ -61,17 +61,36 @@ router.post('/', async( req, res, next ) => {
 /** PUT /invoices/[id] */
 router.put('/:id', async( req, res, next ) => {
     try {
-        const { amt } = req.body;
+        const { amt, paid } = req.body;
         const { id } = req.params;
+        let paidDate = null;
 
-        let result = await db.query(
-            `UPDATE invoices SET amt=$1 
-            WHERE id=$2
+        let invoice = await db.query(
+            `SELECT paid
+            FROM invoices
+            WHERE id=$1`, 
+            [ id ] );
+
+        if(invoice.rowCount === 0) throw new ExpressError(`Id: ${ id } does not exist in db`, 404);
+
+        const currPaidDate = invoice.rows[0].paid_date;
+
+        if( !currPaidDate && paid ) { 
+            paidDate = new Date();
+        } else if ( !paid ) {
+            paidDate = null;
+        } else {
+            paidDate = currPaidDate;
+        };
+
+        let invRes = await db.query(
+            `UPDATE invoices 
+            SET amt=$1, paid=$2, paid_date=$3
+            WHERE id=$4
             RETURNING id, comp_code, amt, paid, add_date, paid_date`, 
-            [ amt, id ] );
-
-        if(result.rowCount === 0) throw new ExpressError(`Id: ${ id } does not exist in db`, 404);
-        return res.status(200).json( { invoice: result.rows[0] } );
+            [ amt, paid, paidDate, id ] );
+            
+        return res.status(200).json( { invoice: invRes.rows[0] } );
     } catch ( err ) {
         return next( err );
     }
