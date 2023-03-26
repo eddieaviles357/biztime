@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const db = require('../db');
+const slugify = require('slugify');
 const ExpressError = require('../expressError');
 
 /** GET /companies/ get all companies */
@@ -59,12 +60,14 @@ router.get('/:code', async( req, res, next ) => {
 router.post('/', async( req, res, next ) => {
     try {
         const { code, name, description } = req.body;
-
+        // replaces space with - also lower cases name
+        let slugifiedName = slugify(name, { lower: true } );
+        
         let result = await db.query(
             `INSERT INTO companies (code, name, description)
             VALUES($1, $2, $3)
             RETURNING code, name, description`,
-            [ code, name, description ]
+            [ code, slugifiedName, description ]
         );
 
         return res.status( 201 ).json( { company: result.rows[0] } )
