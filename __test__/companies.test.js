@@ -10,6 +10,7 @@ let code;
 let name;
 let description;
 let industries;
+let add_date;
 beforeEach( async() => {
     let companies = await db.query(
         `INSERT INTO companies
@@ -28,6 +29,8 @@ beforeEach( async() => {
         RETURNING id, comp_code, amt, paid, paid_date, add_date`);
     /** assign id for testing */
     id = invoicesRes.rows[0].id;
+    /** turn date to json object */
+    add_date = invoicesRes.rows[0].add_date.toJSON();
 
     let indResults = await db.query(
         `INSERT INTO industries (code, industry)
@@ -51,6 +54,7 @@ afterEach( async() => {
     name = null;
     description = null;
     industries = null;
+    add_date = null;
     await db.query(`DELETE FROM invoices`);
     await db.query(`DELETE FROM companies`);
     await db.query(`DELETE FROM industries`);
@@ -77,13 +81,13 @@ describe('GET /companies/:code', () => {
         const res = await request(app).get(`/companies/${code}`);
         let body = res.body;
         expect(res.statusCode).toBe(200);
-         expect(body).toHaveProperty('company', {
+        expect(body).toHaveProperty('company', {
             code, 
             description, 
             "industries": ["technology"], 
             "invoices": [
                 {
-                    "add_date": "2023-03-24T07:00:00.000Z", 
+                    add_date, 
                     "amt": 100, 
                     "code": "bbraun", 
                     id, 
