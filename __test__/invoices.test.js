@@ -7,6 +7,8 @@ const db = require('../db');
 
 let id;
 let add_date;
+let paid;
+let paid_date;
 beforeEach( async() => {
     let companies = await db.query(
         `INSERT INTO companies
@@ -20,12 +22,13 @@ beforeEach( async() => {
     /** assign id for testing */
     id = invoices.rows[0].id;
     add_date = invoices.rows[0].add_date.toJSON();
-
 });
 
 afterEach( async() => {
     id = null;
     add_date = null;
+    paid = null;
+    paid_date = null;
     await db.query(`DELETE FROM invoices`);
     await db.query(`DELETE FROM companies`);
 });
@@ -119,16 +122,18 @@ describe('POST /invoices', () => {
 describe('PUT /invoices/:id', () => {
     test('update an existing invoice', async() => {
         const amt = 100;
-        const res = await request(app).put(`/invoices/${id}`).send( { amt } );
+        paid = true;
+        paid_date = add_date;
+        const res = await request(app).put(`/invoices/${id}`).send( { amt, paid: "true" } );
         const body = res.body;
-        expect(res.statusCode).toBe(200);
+        expect(res.statusCode).toBe(200);    
         expect(body).toHaveProperty('invoice', {
             id,
             comp_code: 'bbraun',
             amt,
-            paid: false,
+            paid,
             add_date,
-            paid_date: null
+            paid_date
           });
     });
 
