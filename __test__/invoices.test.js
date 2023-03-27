@@ -127,7 +127,7 @@ describe('PUT /invoices/:id', () => {
         const amt = 100;
         paid = true;
         paid_date = add_date;
-        const res = await request(app).put(`/invoices/${id}`).send( { amt, paid: "true" } );
+        const res = await request(app).put(`/invoices/${id}`).send( { amt, paid } );
         const body = res.body;
         expect(res.statusCode).toBe(200);    
         expect(body).toHaveProperty('invoice', {
