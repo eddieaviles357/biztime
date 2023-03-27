@@ -9,6 +9,7 @@ let id;
 let add_date;
 let paid;
 let paid_date;
+let comp_code;
 beforeEach( async() => {
     let companies = await db.query(
         `INSERT INTO companies
@@ -18,9 +19,10 @@ beforeEach( async() => {
         `INSERT INTO invoices (comp_code, amt, paid, paid_date)
         VALUES 
         ('bbraun', 100, false, null)
-        RETURNING id, add_date`);
+        RETURNING id, add_date, comp_code`);
     /** assign id for testing */
     id = invoices.rows[0].id;
+    comp_code = invoices.rows[0].comp_code;
     add_date = invoices.rows[0].add_date.toJSON();
 });
 
@@ -29,6 +31,7 @@ afterEach( async() => {
     add_date = null;
     paid = null;
     paid_date = null;
+    comp_code = null;
     await db.query(`DELETE FROM invoices`);
     await db.query(`DELETE FROM companies`);
 });
@@ -129,7 +132,7 @@ describe('PUT /invoices/:id', () => {
         expect(res.statusCode).toBe(200);    
         expect(body).toHaveProperty('invoice', {
             id,
-            comp_code: 'bbraun',
+            comp_code,
             amt,
             paid,
             add_date,
